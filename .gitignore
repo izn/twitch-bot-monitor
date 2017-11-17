@@ -1,0 +1,7 @@
+__pycache__/
+*.py[cod]
+*$py.class
+.webassets-cache
+.python-version
+.env
+.venv
