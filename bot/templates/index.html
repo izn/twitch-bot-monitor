@@ -3,18 +3,27 @@
     <title>{{ channel }}</title>
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css">
+    <style type="text/css">
+        body {
+            font-family: "Ubuntu Regular", "Consolas", "Courier New";
+            background: #000;
+            color: #48fb47
+        }
+
+        h2 { color: #fff }
+    </style>
 </head>
-<body style="background: black; font-family: Consolas">
+<body>
     <div class="container" id="app">
         <div class="row">
             <div class="col-lg-12">
-                <h2 style="color: white">#{{ channel }}</h2>
+                <h2>#{{ channel }}</h2>
             </div>
         </div>
 
         <div class="row">
             <div class="col-lg-12">
-                <div v-for="word in word_list" class="w-100" style="color: #48fb47;">
+                <div v-for="word in word_list">
                     <strong>[[ word.term ]]</strong> --> [[ word.ocurrencies ]]x
                 </div>
             </div>
@@ -34,18 +43,18 @@
             word_list: []
         },
         methods: {
-            loadData: function () {
+            load_data: function () {
                 $.get('/stream', function (response) {
                     this.word_list = response;
                 }.bind(this));
             }
         },
         created: function () {
-            this.loadData();
+            this.load_data();
 
             setInterval(function () {
-                this.loadData();
-            }.bind(this), 3000); 
+                this.load_data();
+            }.bind(this), 3000);
         }
     })
 </script>
