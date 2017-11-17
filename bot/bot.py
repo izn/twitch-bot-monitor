@@ -1,4 +1,5 @@
 import dotenv
+import nltk.corpus
 import socket
 import string
 import os
@@ -6,7 +7,7 @@ import re
 import redis
 import unicodedata
 
-
+nltk.download('stopwords')
 dotenv.load_dotenv(dotenv.find_dotenv())
 
 r = redis.Redis()
@@ -42,8 +43,10 @@ while 1:
 
         print('#{0} @ {1}: {2}'.format(_channel, _user, _msg))
 
-        for msg in list(set(_msg.split(" "))):
-            filtered_word = msg.strip(string.punctuation)
+        words = [w for w in set(_msg.split(" ")) if w not in nltk.corpus.stopwords.words('portuguese')]
+
+        for word in words:
+            filtered_word = word.strip(string.punctuation)
             filtered_word = unicodedata.normalize('NFD', filtered_word)
 
             if len(filtered_word) > 2:
