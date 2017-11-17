@@ -43,11 +43,11 @@ while 1:
 
         print('#{0} @ {1}: {2}'.format(_channel, _user, _msg))
 
-        words = [w for w in set(_msg.split(" ")) if w not in nltk.corpus.stopwords.words('portuguese')]
+        words = [w.strip(string.punctuation) for w in _msg.split(" ")]
+        words = [w for w in words if w not in nltk.corpus.stopwords.words('portuguese')]
 
         for word in words:
-            filtered_word = word.strip(string.punctuation)
-            filtered_word = unicodedata.normalize('NFD', filtered_word)
+            filtered_word = unicodedata.normalize('NFD', word)
 
             if len(filtered_word) > 2:
                 r.zincrby(_channel, filtered_word, 1)
