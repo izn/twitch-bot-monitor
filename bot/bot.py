@@ -46,7 +46,7 @@ while 1:
         words = [w.strip(string.punctuation) for w in _msg.split(" ")]
         words = [w for w in words if w not in nltk.corpus.stopwords.words('portuguese')]
 
-        for word in words:
+        for word in set(words):
             filtered_word = unicodedata.normalize('NFD', word)
 
             if len(filtered_word) > 2:

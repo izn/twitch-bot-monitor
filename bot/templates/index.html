@@ -11,10 +11,14 @@
         }
 
         h2 { color: #fff }
+
+        .flip-list-move {
+            transition: transform 1s;
+        }
     </style>
 </head>
 <body>
-    <div class="container" id="app">
+    <div class="container">
         <div class="row">
             <div class="col-lg-12">
                 <h2>#{{ channel }}</h2>
@@ -22,10 +26,12 @@
         </div>
 
         <div class="row">
-            <div class="col-lg-12">
-                <div v-for="word in word_list">
-                    <strong>[[ word.term ]]</strong> --> [[ word.ocurrencies ]]x
-                </div>
+            <div id="app" class="col-lg-12">
+                <transition-group name="flip-list" tag="ul">
+                    <li v-for="word in word_list" :key="word.term">
+                        <strong>[[ word.term ]]</strong> --> [[ word.ocurrencies ]]x
+                    </li>
+                </transition-group>
             </div>
         </div>
     </div>
@@ -36,26 +42,26 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"></script>
 <script src="https://unpkg.com/vue"></script>
 <script type="text/javascript">
-const app = new Vue({
-  el: "#app",
-  delimiters: ["[[", "]]"],
-  data: {
-    word_list: []
-  },
-  methods: {
-    load_data() {
-      $.get('/stream', response => {
-        this.word_list = response;
-      });
-    }
-  },
-  created() {
-    this.load_data();
-
-    setInterval(() => {
+app = new Vue({
+    el: "#app",
+    delimiters: ["[[", "]]"],
+    data: {
+      word_list: []
+    },
+    methods: {
+      load_data() {
+          $.get('/stream', response => {
+              this.word_list = response;
+          });
+      }
+    },
+    created() {
       this.load_data();
-    }, 3000);
-  }
+
+      setInterval(() => {
+          this.load_data();
+      }, 3000);
+    }
 });
 </script>
 </html>
