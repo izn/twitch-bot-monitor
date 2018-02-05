@@ -24,7 +24,7 @@ Then fill the environment variables on ``.env`` file.
 
 ``TWITCH_OAUTH``: Twitch OAuth ([Generate here](https://twitchapps.com/tmi/))
 
-``TWITCH_CHANNEL``: The channel the bot will monitor (i.e.: ``dotastarladder_en``)
+``TWITCH_CHANNEL``: The channel the bot will monitor (e.g.: ``dotastarladder_en``)
 
 ## Usage
 
