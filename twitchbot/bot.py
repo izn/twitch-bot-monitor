@@ -1,22 +1,16 @@
 import dotenv
 import nltk.corpus
-import socket
-import string
 import os
 import re
 import redis
+import socket
+import string
 import unicodedata
 
 nltk.download('stopwords')
 dotenv.load_dotenv(dotenv.find_dotenv())
 
 r = redis.Redis()
-
-SERVER = 'irc.chat.twitch.tv'
-NICK = os.environ.get('TWITCH_LOGIN')
-PASSWD = os.environ.get('TWITCH_OAUTH')
-CHANNEL = os.environ.get('TWITCH_CHANNEL')
-PORT = 6667
 
 
 def parse_pingpong(data):
@@ -29,39 +23,49 @@ def parse_privmsg(data):
 
 class Bot(object):
     def __init__(self):
-        self.s = socket.socket()
-        self.s.connect((SERVER, PORT))
+        self.server = 'irc.chat.twitch.tv'
+        self.nick = os.environ.get('TWITCH_LOGIN')
+        self.passwd = os.environ.get('TWITCH_OAUTH')
+        self.channel = os.environ.get('TWITCH_CHANNEL')
+        self.port = 6667
 
-        self.s.send(bytes('PASS %s\r\n' % PASSWD, 'utf-8'))
-        self.s.send(bytes('NICK %s\r\n' % NICK, 'utf-8'))
-        self.s.send(bytes('JOIN #%s\r\n' % CHANNEL.lower(), 'utf-8'))
+    def send(self, data):
+        raw = '{}\r\n'.format(data)
+        self.s.send(raw.encode())
 
     def start(self):
+        self.s = socket.socket()
+        self.s.connect((self.server, self.port))
+
+        self.send('PASS {}'.format(self.passwd))
+        self.send('NICK {}'.format(self.nick))
+        self.send('JOIN #{}'.format(self.channel.lower()))
+
         while True:
             buffered = self.s.recv(1024)
-            data = buffered.decode('utf-8')
+            data = buffered.decode()
 
             privmsg = parse_privmsg(data)
 
             if parse_pingpong(data):
                 print("[PING] Sending PONG :)")
-                self.s.send(b'PONG :tmi.twitch.tv\r\n')
+                self.send('PONG :tmi.twitch.tv')
 
             if privmsg:
-                _user = privmsg.group(1).lower()
-                _channel = privmsg.group(2).lower()
-                _msg = privmsg.group(3).lower()
+                user = privmsg.group(1).lower()
+                channel = privmsg.group(2).lower()
+                msg = privmsg.group(3).lower()
 
-                print('#{0} @ {1}: {2}'.format(_channel, _user, _msg))
+                print('#{0} @ {1}: {2}'.format(channel, user, msg))
 
-                words = [w.strip(string.punctuation) for w in _msg.split(" ")]
+                words = [w.strip(string.punctuation) for w in msg.split(" ")]
                 words = [w for w in words if w not in nltk.corpus.stopwords.words('portuguese')]
 
                 for word in set(words):
                     filtered_word = unicodedata.normalize('NFD', word)
 
                     if len(filtered_word) > 2:
-                        r.zincrby(_channel, filtered_word, 1)
+                        r.zincrby(channel, filtered_word)
 
 
 if __name__ == '__main__':

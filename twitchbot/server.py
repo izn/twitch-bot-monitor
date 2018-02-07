@@ -15,7 +15,7 @@ def create_app():
     channel = os.environ.get('TWITCH_CHANNEL')
 
     def parse_messages():
-        stats = r.zrevrange(channel, 0, 21, withscores=True)
+        stats = r.zrevrange(channel, 0, 19, withscores=True)
         return [{'term': w, 'ocurrencies': o} for w, o in stats]
 
     @app.context_processor
