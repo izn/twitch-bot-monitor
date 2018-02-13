@@ -14,9 +14,9 @@ Install directly from the GitHub repository
 
 ## Configuration
 
-Start copying the ``env.example`` to ``.env``
+Start copying the ``env.sample`` to ``.env``
 
-    cp env.example .env
+    cp env.sample .env
 
 Then fill the environment variables on ``.env`` file.
 
